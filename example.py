@@ -1,6 +1,7 @@
 from cosmic import CosmicUnicorn
 from picographics import PicoGraphics, DISPLAY_COSMIC_UNICORN
 from mlx90640 import MLX90640
+from pimoroni_i2c import PimoroniI2C
 
 ##Init the i2c bus
 i2c = PimoroniI2C(sda=(4), scl=(5), baudrate=1000000)
@@ -46,7 +47,6 @@ c_table = (
 (242,244,130),(243,245,134),(243,246,138),(244,248,142),(245,249,146),(246,250,150),(248,251,154),
 (249,252,157),(250,253,161),(252,255,164))
 
-
 print ("Start")
 sensor = MLX90640(i2c)
 frame = sensor.get_frame_array()
@@ -76,9 +76,18 @@ def UpdateScreenFromImageBuffer(min:int, max:int, buffer):
             draw_pixel(x,y)
             index+=1
 
+    set_pen(create_pen(0,0,0))
+    for y in range(8):
+        for x in range(32):
+            draw_pixel(x,31-y)
+
+    set_pen(create_pen(192,192,192))
+    txt = "{:.1f}".format(max)    
+    graphics.text(txt, 5,24, scale=1)
+
     cu.update(graphics)
     
-
+graphics.set_font("bitmap8")
 while(True):
     sensor.read_frame_into(frame)
     UpdateScreenFromImageBuffer(min(frame), max(frame), frame)
